@@ -1,35 +1,37 @@
-import React, { useEffect, useState } from "react";
+import { validateHeaderValue } from 'http'
+import React, { useEffect, useState } from 'react'
 
 export const App = () => {
-  const [isReady, setReady] = useState(false);
-  const [eurInfo, setEurInfo] = useState<any>({});
+  const [isReady, setReady] = useState(false)
+  const [eurInfo, setEurInfo] = useState<any>({})
 
-  const getEurInfo = async () => {
-    const krweur = await fetch(
-      "https://quotation-api-cdn.dunamu.com/v1/forex/recent?codes=FRX.KRWEUR"
-    )
-      .then((response) => response.json())
-      .then((array) => array[0]);
-
-    setEurInfo(krweur);
-    setReady(true);
-  };
-
-  const exchangeEurToKrw = (krw: any) => krw * eurInfo.basePrice;
+  const exchangeEurToKrw = (krw: any) => krw * eurInfo.basePrice
 
   useEffect(() => {
-    getEurInfo();
-    return () => {};
-  }, []);
+    setReady(false)
+    fetch(
+      'https://quotation-api-cdn.dunamu.com/v1/forex/recent?codes=FRX.KRWEUR'
+    )
+      .then((response) => response.json())
+      .then((array) => {
+        setEurInfo(array[0])
+        setReady(true)
+      })
+  }, [])
 
-  if (!isReady) return null;
+  if (!isReady)
+    return (
+      <section>
+        <p>환율 정보 로딩 중..</p>
+      </section>
+    )
   return (
-    <div className="App">
+    <div className='App'>
       <div>환율기준 (1 유로)</div>
       <div>
         {eurInfo.basePrice}
-        {eurInfo.basePrice - eurInfo.openingPrice > 0 && "▲"}
-        {eurInfo.basePrice - eurInfo.openingPrice < 0 && "▼"}
+        {eurInfo.basePrice - eurInfo.openingPrice > 0 && '▲'}
+        {eurInfo.basePrice - eurInfo.openingPrice < 0 && '▼'}
         {eurInfo.changePrice}원 (
         {(eurInfo.changePrice / eurInfo.basePrice) * 100}%)
       </div>
@@ -42,7 +44,7 @@ export const App = () => {
       <hr />
       <input /> 유로 ▶︎ <input disabled /> 원
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
